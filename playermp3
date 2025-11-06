@@ -1,0 +1,78 @@
+import pygame # библиотека для создания игр и мультимедийных приложений
+import os # библиотека для работы с мультимедиа файловой системы
+
+MUSIC_PATH = "./playermp3/music" # путь к папке с музыкой
+TRACKS = sorted(os.listdir(MUSIC_PATH)) # список всех музыкальных файлов в папке
+
+pygame.init() # инициализация всех модулей pygame
+screen = pygame.display.set_mode((500, 300)) # установка размеров окна
+pygame.display.set_caption("Music Player") # заголовок окна
+
+font_main = pygame.font.Font('freesansbold.ttf', 20)  #  основной шрифт
+font_small = pygame.font.Font('freesansbold.ttf', 15) # дополнительный шрифт
+
+# transform.scale - изменение размера изображения
+
+pause_icon = pygame.transform.scale(pygame.image.load('./playermp3/play.png'), (70, 70)) # иконка паузы
+play_icon = pygame.transform.scale(pygame.image.load('./playermp3/pause.png'), (70, 70)) # иконка воспроизведения
+
+current_track = 0 # индекс текущего трека   
+playing = False # состояние воспроизведения (играет/на паузе)
+clock = pygame.time.Clock() # объект для управления частотой кадров
+
+
+def play_track():  # функция для воспроизведения текущего трека
+    pygame.mixer.music.load(os.path.join(MUSIC_PATH, TRACKS[current_track]))
+    pygame.mixer.music.play()
+    
+
+def toggle_play_pause(): # функция для переключения состояния воспроизведения
+    global playing
+    playing = not playing
+    if playing == True:
+        play_track()
+    else:
+        pygame.mixer.music.pause()
+
+
+def draw_screen(): # функция для обновления экрана
+    screen.fill((240, 240, 240))
+    
+    track_text = font_main.render(TRACKS[current_track], True, (50, 50, 50))
+    screen.blit(track_text, (250 - track_text.get_width() // 2, 100))
+    
+    if playing == True:
+        icon = play_icon
+    else:
+        icon = pause_icon
+    
+    screen.blit(icon, (250 - icon.get_width()//2, 150))
+
+    creator_text = font_small.render("Music Player", True, (180, 180, 180))
+    screen.blit(creator_text, (250 - creator_text.get_width() // 2, 270))
+    
+    pygame.display.flip() 
+
+
+running = True # отвечает за условия работы цикла
+while running: # главный цикл программы
+    for event in pygame.event.get(): # обработка событий
+        if event.type == pygame.QUIT: # выход из программы
+            running = False     # выход из программы
+        
+        if event.type == pygame.KEYDOWN:   # обработка нажатий клавиш 
+            if event.key == pygame.K_SPACE: # пробел для паузы/воспроизведения
+                toggle_play_pause() # переключение состояния воспроизведения
+            elif event.key == pygame.K_RIGHT: # стрелка вправо для следующего трека
+                current_track = (current_track + 1) % len(TRACKS) # переход к следующему треку
+                play_track() # воспроизведение следующего трека
+                playing = True # установка состояния воспроизведения на "играет"
+            elif event.key == pygame.K_LEFT: # стрелка влево для предыдущего трека
+                current_track = (current_track - 1) % len(TRACKS) # переход к предыдущему треку
+                play_track() # воспроизведение предыдущего трека
+                playing = True # установка состояния воспроизведения на "играет"
+
+    draw_screen() # обновление экрана
+    clock.tick(60)  # установка частоты кадров
+
+pygame.quit() # завершение работы pygame
