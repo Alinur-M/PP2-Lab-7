@@ -1,0 +1,45 @@
+import pygame # импортируем библиотеку pygame
+pygame.init() # инициализируем pygame
+
+WIDTH, HEIGHT = 700, 700 # задаем размеры экрана
+WHITE = (255,255,255)   # задаем цвет белый
+RED = (255,0,0)           # задаем цвет красный
+
+radius = 25     # радиус круга
+step = 20   # шаг перемещения круга
+
+x = WIDTH // 2  # начальная позиция круга по оси X
+y = HEIGHT // 2  # начальная позиция круга по оси Y
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT)) # создаем окно с заданными размерами
+clock = pygame.time.Clock() # создаем объект Clock для управления частотой кадров
+
+running = True  # отвечает за условия работы цикла
+while running: # главный цикл программы
+    for event in pygame.event.get(): # обработка событий
+        if event.type == pygame.QUIT: # выход из программы
+            running = False # завершаем цикл и выходим из программы
+    
+    keys = pygame.key.get_pressed() # получаем состояние всех клавиш
+    
+    sdvig_po_OX = x + (keys[pygame.K_d] - keys[pygame.K_a]) * step  # вычисляем смещение по оси X            
+    sdvig_po_OY = y + (keys[pygame.K_s] - keys[pygame.K_w]) * step # вычисляем смещение по оси Y
+
+    if WIDTH - radius > sdvig_po_OX: # проверяем границы по оси X
+
+        x = max(radius, sdvig_po_OX) # обновляем позицию круга по оси X
+    else: # если круг выходит за границы
+        x = max(radius, WIDTH - radius) # обновляем позицию круга по оси X
+
+    if HEIGHT - radius > sdvig_po_OY: # проверяем границы по оси Y
+        y = max(radius, sdvig_po_OY) # обновляем позицию круга по оси Y
+    else: 
+        y = max(radius, HEIGHT - radius) # обновляем позицию круга по оси Y
+
+    screen.fill(WHITE) # заполняем экран белым цветом
+    pygame.draw.circle(screen, RED, (x, y), radius) # рисуем круг на экране
+    
+    pygame.display.flip()   # обновляем экран
+    clock.tick(60)      # устанавливаем частоту кадров до 60 FPS
+
+pygame.quit()   # завершаем работу pygame
